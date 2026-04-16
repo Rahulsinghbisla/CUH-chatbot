@@ -7,7 +7,7 @@ import { useState } from "react";
 
 import { authClient } from "@/lib/auth-client"; //import the auth client
 
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import { useForm } from "@tanstack/react-form";
 
 import { toast } from "sonner";
@@ -29,6 +29,7 @@ import { Input } from "@/components/ui/input";
 import { FieldError, FieldGroup } from "@/components/ui/field";
 
 import { GithubIcon, GoogleIcon } from "../icons";
+import { auth } from "@/lib/auth";
 
 const signupSchema = z.object({
   username: z.string().min(3, "Username must be at least 3 characters"),
@@ -39,11 +40,29 @@ const signupSchema = z.object({
 type SocialProvider = "google" | "github";
 
 export default function SignupForm() {
+
   const router = useRouter();
   const [pendingProvider, setPendingProvider] = useState<SocialProvider | null>(
     null,
   );
   const [isLoading,setIsLoading] = useState<boolean>(false)
+
+  async function handleSubmitSocial(provider:SocialProvider){
+      setPendingProvider(provider)
+      try {
+          await authClient.signIn.social({
+                  provider: provider,
+                  callbackURL: "/",
+                  errorCallbackURL: "/error",
+                  newUserCallbackURL: "/",
+                })
+      } catch (error) {
+        setPendingProvider(null)
+        console.error(error)
+        toast.error("Failed to sign-in")
+      }
+  
+    }
 
   const form = useForm({
     defaultValues: { username: "", email: "", password: "" },
@@ -78,6 +97,13 @@ export default function SignupForm() {
     
   });
 
+  // const session = await auth.api.getSession({
+  //   headers: await headers()
+  // })
+  // if(!session){
+  //   redirect("/auth/signup")
+  // }
+
   return (
     <div className="flex items-center justify-center h-dvh">
       <Card className="w-full max-w-110 border-[#262626] bg-[#121212] text-white">
@@ -104,8 +130,8 @@ export default function SignupForm() {
             <Button
               variant="outline"
               disabled={false}
-              className="h-13 w-full rounded-xl border-[#424242] bg-transparent text-[15px] font-normal transition-colors hover:bg-[#2f2f2f] hover:text-white disabled:opacity-70"
-              onClick={() => { }}
+              className="h-13 w-full rounded-xl border-[#424242] bg-transparent text-[15px] font-normal transition-colors cursor-pointer hover:bg-[#2f2f2f] hover:text-white disabled:opacity-70"
+              onClick={() => { handleSubmitSocial("google")}}
             >
               {pendingProvider === "google" ? (
                 <Loader2 className="mr-2 size-5 animate-spin" />
@@ -119,8 +145,8 @@ export default function SignupForm() {
             <Button
               variant="outline"
               disabled={false}
-              className="h-13 w-full rounded-xl border-[#424242] bg-transparent text-[15px] font-normal transition-colors hover:bg-[#2f2f2f] hover:text-white disabled:opacity-70"
-              onClick={() => { }}
+              className="h-13 w-full rounded-xl border-[#424242] bg-transparent text-[15px] font-normal transition-colors cursor-pointer hover:bg-[#2f2f2f] hover:text-white disabled:opacity-70"
+              onClick={() => { handleSubmitSocial("github")}}
             >
               {pendingProvider === "github" ? (
                 <Loader2 className="mr-2 size-5 animate-spin" />

@@ -30,13 +30,28 @@ type SocialProvider = "google" | "github";
 import { useState } from "react";
 import { useForm } from "@tanstack/react-form";
 import { authClient } from "@/lib/auth-client";
+import { toast } from "sonner";
 
 export default function LoginForm() {
   const [pendingProvider, setPendingProvider] = useState<SocialProvider | null>(
     null,
   );
-  const [isLoading, setIsLoading] = useState<boolean>(false)
+  async function handleSubmitSocial(provider:SocialProvider){
+    setPendingProvider(provider)
+    try {
+        await authClient.signIn.social({
+                provider: provider,
+                callbackURL: "/",
+                errorCallbackURL: "/error",
+                newUserCallbackURL: "/",
+              })
+    } catch (error) {
+      setPendingProvider(null)
+      console.error(error)
+      toast.error("Failed to sign-in")
+    }
 
+  }
   const form = useForm({
     defaultValues: { email: "", password: "" },
     validators: {
@@ -73,19 +88,7 @@ export default function LoginForm() {
               variant="outline"
               // disabled={isLoading}
               className="h-13 w-full rounded-xl border-[#424242] bg-transparent text-[15px] font-normal transition-colors cursor-pointer hover:bg-[#2f2f2f] hover:text-white disabled:opacity-70"
-              onClick={async () => {
-                await authClient.signIn.social({
-                provider: "google",
-                callbackURL: "/",
-                errorCallbackURL: "/error",
-                newUserCallbackURL: "/",
-                /**
-                 * disable the automatic redirect to the provider. 
-                 * @default false
-                 */
-                // disableRedirect: true,
-              })
-              }}
+              onClick={()=>{handleSubmitSocial("google")}}
             >
             {pendingProvider === "google" ? (
               <Loader2 className="mr-2 size-5 animate-spin" />
@@ -100,20 +103,7 @@ export default function LoginForm() {
             variant="outline"
             // disabled={false}
             className="h-13 w-full rounded-xl border-[#424242] bg-transparent text-[15px] font-normal transition-colors cursor-pointer hover:bg-[#2f2f2f] hover:text-white disabled:opacity-70"
-            onClick={async () => {
-              await authClient.signIn.social({
-                provider: "github",
-                callbackURL: "/",
-                errorCallbackURL: "/error",
-                newUserCallbackURL: "/",
-                /**
-                 * disable the automatic redirect to the provider. 
-                 * @default false
-                 */
-                // disableRedirect: true,
-
-              });
-            }}
+            onClick={ () => {handleSubmitSocial("github")}}
           >
             {pendingProvider === "github" ? (
               <Loader2 className="mr-2 size-5 animate-spin" />
