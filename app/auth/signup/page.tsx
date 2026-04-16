@@ -5,6 +5,8 @@ import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
 
+import { authClient } from "@/lib/auth-client"; //import the auth client
+
 import { useRouter } from "next/navigation";
 import { useForm } from "@tanstack/react-form";
 
@@ -41,13 +43,39 @@ export default function SignupForm() {
   const [pendingProvider, setPendingProvider] = useState<SocialProvider | null>(
     null,
   );
+  const [isLoading,setIsLoading] = useState<boolean>(false)
 
   const form = useForm({
     defaultValues: { username: "", email: "", password: "" },
     validators: {
       onChange: signupSchema,
     },
-    onSubmit: async ({ value }) => {},
+    onSubmit: async ({ value }) => {
+
+      await authClient.signUp.email({
+        email:value.email, // user email address
+        password:value.password, // user password -> min 8 characters by default
+        name:value.username, // user display name
+        callbackURL: "/" // A URL to redirect to after the user verifies their email (optional)
+      }, {
+        onRequest: (ctx) => {
+          setIsLoading(true)
+          //show loading
+        },
+        onSuccess: (ctx) => {
+          setIsLoading(false)
+          toast.success("You are successfully Signed In")
+          router.push('/')
+          //redirect to the dashboard or sign in page
+        },
+        onError: (ctx) => {
+          // display the error message
+          setIsLoading(false)
+          toast.error(ctx.error.message || "Failed to Register")
+        },
+      });
+    },
+    
   });
 
   return (
@@ -59,13 +87,13 @@ export default function SignupForm() {
             className="h-10 w-10 mx-auto"
             height={40}
             width={40}
-            alt="CodersGPT"
+            alt="cuhBot"
           />
           <CardTitle className="text-[32px] font-semibold tracking-tight text-[#ececec]">
             Create an account
           </CardTitle>
           <CardDescription className="mx-auto max-w-80 text-[15px] leading-relaxed text-[#b4b4b4]">
-            Join CodersGPT to get smarter responses and start building today.
+            Join cuhBot to get smarter responses and start building today.
           </CardDescription>
         </CardHeader>
 
@@ -77,7 +105,7 @@ export default function SignupForm() {
               variant="outline"
               disabled={false}
               className="h-13 w-full rounded-xl border-[#424242] bg-transparent text-[15px] font-normal transition-colors hover:bg-[#2f2f2f] hover:text-white disabled:opacity-70"
-              onClick={() => {}}
+              onClick={() => { }}
             >
               {pendingProvider === "google" ? (
                 <Loader2 className="mr-2 size-5 animate-spin" />
@@ -92,7 +120,7 @@ export default function SignupForm() {
               variant="outline"
               disabled={false}
               className="h-13 w-full rounded-xl border-[#424242] bg-transparent text-[15px] font-normal transition-colors hover:bg-[#2f2f2f] hover:text-white disabled:opacity-70"
-              onClick={() => {}}
+              onClick={() => { }}
             >
               {pendingProvider === "github" ? (
                 <Loader2 className="mr-2 size-5 animate-spin" />
@@ -231,7 +259,7 @@ export default function SignupForm() {
                 children={([canSubmit, isSubmitting, isDirty]) => (
                   <Button
                     type="submit"
-                    className="mt-2 h-13 w-full rounded-full bg-[#ececec] text-[16px] font-semibold text-black hover:bg-white disabled:opacity-50"
+                    className="mt-2 h-13 w-full rounded-full bg-[#ececec] text-[16px] font-semibold text-black hover:bg-white disabled:opacity-50 "
                     disabled={!canSubmit || !isDirty}
                   >
                     {isSubmitting ? (

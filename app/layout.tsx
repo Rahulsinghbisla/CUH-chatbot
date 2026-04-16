@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const TITLE = "CodersGPT";
+const TITLE = "cuhBot";
 const DESCRIPTION = "chatbot for coders";
 const BASE_URL = "http://localhost:3000";
 
@@ -22,7 +22,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
   title: TITLE,
   description: DESCRIPTION,
-  keywords: "CodersGPT,codersgpt",
+  keywords: "cuhBot,cuhBot",
   authors: [
     {
       name: "codersgyan",
@@ -36,7 +36,7 @@ export const metadata: Metadata = {
     url: BASE_URL,
     title: TITLE,
     description: DESCRIPTION,
-    siteName: "CodersGPT",
+    siteName: "cuhBot",
     images: [
       {
         url: `${BASE_URL}/og.jpg`,
