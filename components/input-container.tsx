@@ -14,6 +14,7 @@ import { useState } from "react";
 import { DefaultChatTransport } from "ai";
 import { v4 as uuidv4 } from 'uuid';
 import { threadId } from "node:worker_threads";
+import { useChatStore } from "@/store/chat-store";
 
 
 function InputContainer() {
@@ -22,24 +23,9 @@ function InputContainer() {
   const [generateId] = useState(() => uuidv4())
 
   const finalThreadId = thread_id || generateId;
-
+  const {chatInstance} = useChatStore()
   const { messages, sendMessage } = useChat({
-    transport: new DefaultChatTransport({
-      api: '/api/chat',
-      prepareSendMessagesRequest: ({ id, messages, body }) => {
-        const lastMessage = messages.at(-1)?.parts[0]
-        let lastMessageText = ""
-        if (lastMessage?.type == "text") {
-          lastMessageText = lastMessage.text
-        }
-        return {
-          body: {
-            messageContent: lastMessageText, // Only send last 1 messages
-            threadId: body?.threadId
-          },
-        };
-      },
-    }),
+    chat:chatInstance
   });
   const [input, setInput] = useState("")
 
