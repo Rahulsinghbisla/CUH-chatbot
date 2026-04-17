@@ -11,32 +11,66 @@ import {
 
 import { cn } from "@/lib/utils";
 import { Skeleton } from "../ui/skeleton";
+import { useQuery } from "@tanstack/react-query";
+import { fetchThreads } from "@/lib/thread";
 
 type Thread = {
   title: string;
   id: string;
 };
 
+
+
 export function ThreadsLists() {
+  const { data, isLoading, isEnabled, error } = useQuery({
+    queryKey: ['threads'],
+    queryFn: () => fetchThreads()
+  })
+
+  console.log("data is : ", data)
+
+  if (isLoading) {
+    return (
+      <>
+        {[1, 2, 3, 4, 5].map((item) => {
+          return (
+            <SidebarMenuItem
+              key={item}
+              className="group/item relative pointer-events-none"
+            >
+              <SidebarMenuButton
+                className={cn(
+                  "h-9 rounded-lg transition-all px-3 pr-10 cursor-pointer",
+                  "hover:bg-transparent",
+                )}
+              >
+                <Skeleton className="w-full h-full bg-[#212121]" />
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          );
+        })}
+      </>
+    )
+  }
   const threadMenuContent = (
     <>
-      {[1, 2, 3, 4, 5].map((item) => {
-        return (
-          <SidebarMenuItem
-            key={item}
-            className="group/item relative pointer-events-none"
-          >
-            <SidebarMenuButton
-              className={cn(
-                "h-9 rounded-lg transition-all px-3 pr-10 cursor-pointer",
-                "hover:bg-transparent",
-              )}
+    {data?.map((thread)=>{
+      return (
+            <SidebarMenuItem
+              key={thread.id}
+              className="group/item relative pointer-events-none"
             >
-              <Skeleton className="w-full h-full bg-[#212121]" />
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        );
-      })}
+              <SidebarMenuButton
+                className={cn(
+                  "h-9 rounded-lg transition-all px-3 pr-10 cursor-pointer",
+                  "hover:bg-transparent",
+                )}
+              >
+                <span>{thread.title}</span>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          );
+    })}
     </>
   );
 
