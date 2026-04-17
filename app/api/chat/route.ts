@@ -7,6 +7,7 @@ import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { createUIMessageStreamResponse } from 'ai';
 import { toUIMessageStream } from '@ai-sdk/langchain';
+import { config } from "process";
 
 export async function POST(request: Request) {
   const { threadId, messageContent } = await request.json()
@@ -36,7 +37,10 @@ export async function POST(request: Request) {
   const stream = await agent.streamEvents({
     messages: [new HumanMessage(messageContent)],
   },{
-    version:"v2"
+    version:"v2",
+    configurable:{
+      thread_id:threadId
+    }
   });
 
   return createUIMessageStreamResponse({

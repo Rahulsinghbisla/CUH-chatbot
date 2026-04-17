@@ -24,7 +24,7 @@ export const ChatInterfaceNew = () => {
           </main>
         </div> :
             <div className="flex flex-col h-full">
-              <div className="flex-1">
+              <div className="flex-1 min-h-0">
                 <MessageRender messages={messages} />
               </div>
               <div>

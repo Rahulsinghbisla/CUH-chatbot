@@ -8,13 +8,10 @@ import { PromptInput, PromptInputTextarea } from './ai-elements/prompt-input';
 const Rendering = ({messages}:{
   messages:UIMessage[];
 }) => {
-  const conversationMessages = messages.map((message) => ({
-    role: message.role as "user" | "assistant" | "system" | "data" | "tool",
-    content: message.parts.map((part) => part.type === "text" ? part.text : "").join(""),
-  }));
+
   
   return (
-        <Conversation>
+        <Conversation className='h-full'>
           <ConversationContent>
             {messages.length === 0 ? (
               <ConversationEmptyState
