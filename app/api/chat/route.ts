@@ -5,6 +5,8 @@ import { thread } from "@/db/schema/thread-schema";
 import { eq } from "drizzle-orm"
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
+import { createUIMessageStreamResponse } from 'ai';
+import { toUIMessageStream } from '@ai-sdk/langchain';
 
 export async function POST(request: Request) {
   const { threadId, messageContent } = await request.json()
@@ -31,14 +33,14 @@ export async function POST(request: Request) {
   }
 
 
-  const result = await agent.invoke({
+  const stream = await agent.streamEvents({
     messages: [new HumanMessage(messageContent)],
+  },{
+    version:"v2"
   });
 
-  for (const message of result.messages) {
-    console.log(`[${message.type}]: ${message.text}`);
-  }
-
-  return Response.json({ message: "OK" })
+  return createUIMessageStreamResponse({
+    stream: toUIMessageStream(stream),
+  });
 
 }
