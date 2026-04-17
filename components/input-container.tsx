@@ -9,44 +9,56 @@ import {
   PromptInputTextarea,
 } from "@/components/ai-elements/prompt-input";
 import { SpeechInput } from "@/components/ai-elements/speech-input";
-import {useChat} from '@ai-sdk/react'
+import { useChat } from '@ai-sdk/react'
 import { useState } from "react";
 import { DefaultChatTransport } from "ai";
-import {v4 as uuidv4} from 'uuid';
+import { v4 as uuidv4 } from 'uuid';
+import { threadId } from "node:worker_threads";
 
-
-let myuuid = uuidv4();
 
 function InputContainer() {
+  const { thread_id } = useParams()
+  const router = useRouter()
+  const [generateId] = useState(() => uuidv4())
+
+  const finalThreadId = thread_id || generateId;
 
   const { messages, sendMessage } = useChat({
     transport: new DefaultChatTransport({
-    api: '/api/chat',
-    prepareSendMessagesRequest: ({ id, messages, trigger, messageId }) => {
-      const lastMessage = messages.at(-1)?.parts[0]
-      let lastMessageText =""
-      if(lastMessage?.type=="text"){
-        lastMessageText = lastMessage.text
-      }
-      console.log("last message ",lastMessageText)
-      return {
-        body: {
-          messageContent: lastMessageText, // Only send last 1 messages
-          threadId:myuuid
-        },
-      };
-    },
-  }),
+      api: '/api/chat',
+      prepareSendMessagesRequest: ({ id, messages, body }) => {
+        const lastMessage = messages.at(-1)?.parts[0]
+        let lastMessageText = ""
+        if (lastMessage?.type == "text") {
+          lastMessageText = lastMessage.text
+        }
+        return {
+          body: {
+            messageContent: lastMessageText, // Only send last 1 messages
+            threadId: body?.threadId
+          },
+        };
+      },
+    }),
   });
-  const[input,setInput] = useState("")
+  const [input, setInput] = useState("")
 
   return (
     <div className="flex flex-col items-center w-full max-w-200 mx-auto pb-6">
       <PromptInput
         className="w-full bg-[#2f2f2f] rounded-[32px]"
         onSubmit={(message) => {
-          console.log("messages is ",message);
-          sendMessage({text:message.text})
+          sendMessage(message,
+            {
+              body: {
+                threadId: finalThreadId
+                // todo selected models 
+              },
+            });
+          setInput("")
+          if (!thread_id) {
+            router.push(`chat/${finalThreadId}`)
+          }
         }}
       >
         <PromptInputBody className="flex items-end w-full">
@@ -72,7 +84,7 @@ function InputContainer() {
             <SpeechInput
               className="shrink-0  h-10 w-10 bg-transparent text-white"
               onTranscriptionChange={(text) => {
-                
+
               }}
               size="icon-lg"
               variant="ghost"

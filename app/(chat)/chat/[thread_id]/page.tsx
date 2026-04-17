@@ -7,6 +7,7 @@ export default async function Page({
   params: Promise<{ [key: string]: string | string[] | undefined }>;
 }>) {
   const { thread_id } = await params;
+  console.log("Thread id is ",thread_id)
   return (
     <>
       <ChatInterfaceNew  />

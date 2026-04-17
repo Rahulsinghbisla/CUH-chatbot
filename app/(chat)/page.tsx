@@ -1,6 +1,8 @@
 import { ChatInterfaceNew } from "@/components/chat-interface";
+import { ReactNode } from "react";
 
-export default function HomePage() {
+export default async function HomePage() {
+  
   return (
       <ChatInterfaceNew />
   );
