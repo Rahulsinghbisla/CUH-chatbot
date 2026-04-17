@@ -1,6 +1,5 @@
 "use client";
 
-import { v4 as uuidv4 } from "uuid";
 import { useParams, useRouter } from "next/navigation";
 import { Plus, AudioLines, ArrowUp } from "lucide-react";
 
@@ -13,7 +12,10 @@ import { SpeechInput } from "@/components/ai-elements/speech-input";
 import {useChat} from '@ai-sdk/react'
 import { useState } from "react";
 import { DefaultChatTransport } from "ai";
-import { MessageContent } from "./ai-elements/message";
+import {v4 as uuidv4} from 'uuid';
+
+
+let myuuid = uuidv4();
 
 function InputContainer() {
 
@@ -30,6 +32,7 @@ function InputContainer() {
       return {
         body: {
           messageContent: lastMessageText, // Only send last 1 messages
+          threadId:myuuid
         },
       };
     },
