@@ -1,50 +1,96 @@
-import React from 'react'
-import { Conversation, ConversationContent, ConversationDownload, ConversationEmptyState, ConversationScrollButton } from './ai-elements/conversation';
-import { UIMessage } from '@ai-sdk/react';
-import { MessageSquare } from 'lucide-react';
-import { Message, MessageContent, MessageResponse } from './ai-elements/message';
-import { PromptInput, PromptInputTextarea } from './ai-elements/prompt-input';
+import { UIMessage } from "ai";
+import { RefreshCcwIcon, CopyIcon } from "lucide-react";
+import React, { Fragment } from "react";
+import {
+  Conversation,
+  ConversationContent,
+  ConversationScrollButton,
+} from "./ai-elements/conversation";
+import {
+  Message,
+  MessageAction,
+  MessageActions,
+  MessageContent,
+  MessageResponse,
+} from "./ai-elements/message";
+import { ProductCarousel } from "./gen-ui/product-carsoul";
 
-const Rendering = ({messages}:{
-  messages:UIMessage[];
+
+const MessageRenderer = ({
+  messages,
+}: {
+  messages: UIMessage[];
 }) => {
-
-  
   return (
-        <Conversation className='h-full'>
-          <ConversationContent>
-            {messages.length === 0 ? (
-              <ConversationEmptyState
-                icon={<MessageSquare className="size-12" />}
-                title="Start a conversation"
-                description="Type a message below to begin chatting"
-              />
-            ) : (
-              messages.map((message) => (
-                <Message from={message.role} key={message.id}>
-                  <MessageContent>
-                    {message.parts.map((part, i) => {
-                      switch (part.type) {
-                        case "text": // we don't use any reasoning or tool calls in this example
-                          return (
-                            <MessageResponse key={`${message.id}-${i}`}>
-                              {part.text}
-                            </MessageResponse>
-                          );
-                        default:
-                          return null;
-                      }
-                    })}
-                  </MessageContent>
-                </Message>
-              ))
-            )}
-          </ConversationContent>
-          {/* <ConversationDownload messages={conversationMessages} /> */}
-          <ConversationScrollButton />
-        </Conversation>
-    
-  );
-}
+    <>
+      {messages.map((message, messageIndex) => (
+        <Fragment key={message.id}>
+          {message.parts.map((part, i) => {
+            switch (part.type) {
+              case "text":
+                const isLastMessage =
+                  messageIndex === messages.length - 1;
+                return (
+                  <Fragment key={`${message.id}-${i}`}>
+                    <Message from={message.role}>
+                      <MessageContent>
+                        <MessageResponse>
+                          {part.text}
+                        </MessageResponse>
+                      </MessageContent>
+                    </Message>
+                    {message.role === "assistant" &&
+                      isLastMessage && (
+                        <MessageActions>
+                          <MessageAction
+                            onClick={() => {}}
+                            label="Retry">
+                            <RefreshCcwIcon className="size-3" />
+                          </MessageAction>
+                          <MessageAction
+                            onClick={() =>
+                              navigator.clipboard.writeText(
+                                part.text,
+                              )
+                            }
+                            label="Copy">
+                            <CopyIcon className="size-3" />
+                          </MessageAction>
+                        </MessageActions>
+                      )}
+                  </Fragment>
+                );
+              case "dynamic-tool":
+                switch (part.toolName) {
+                  case "display_products":
+                    if (part.state === "output-available") {
+                      const toolContent = JSON.parse(
+                        (part.output as any).kwargs.content,
+                      );
 
-export default Rendering
+                      return (
+                        <div
+                          key={`${part.toolCallId}-${i}`}>
+                          <ProductCarousel
+                            query={toolContent.query}
+                            products={toolContent.products}
+                          />
+                        </div>
+                      );
+                    }
+                  default:
+                    return null;
+                }
+
+              default:
+                return null;
+            }
+          })}
+        </Fragment>
+      ))}
+      <ConversationScrollButton />
+    </>
+  );
+};
+
+export default MessageRenderer;

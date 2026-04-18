@@ -13,6 +13,7 @@ import { cn } from "@/lib/utils";
 import { Skeleton } from "../ui/skeleton";
 import { useQuery } from "@tanstack/react-query";
 import { fetchThreads } from "@/lib/thread";
+import Link from "next/link";
 
 type Thread = {
   title: string;
@@ -27,7 +28,7 @@ export function ThreadsLists() {
     queryFn: () => fetchThreads()
   })
 
-  console.log("data is : ", data)
+  console.log("data is : ", {data})
 
   if (isLoading) {
     return (
@@ -46,6 +47,7 @@ export function ThreadsLists() {
               >
                 <Skeleton className="w-full h-full bg-[#212121]" />
               </SidebarMenuButton>
+
             </SidebarMenuItem>
           );
         })}
@@ -54,12 +56,12 @@ export function ThreadsLists() {
   }
   const threadMenuContent = (
     <>
-    {data?.map((thread)=>{
-      return (
-            <SidebarMenuItem
-              key={thread.id}
-              className="group/item relative pointer-events-none"
-            >
+      {data?.map((thread) => {
+        return (
+          <SidebarMenuItem
+            key={thread.id}
+            className="group/item relative pointer-pointer"
+          ><Link href={`/chat/${thread.id}`}>
               <SidebarMenuButton
                 className={cn(
                   "h-9 rounded-lg transition-all px-3 pr-10 cursor-pointer",
@@ -68,9 +70,10 @@ export function ThreadsLists() {
               >
                 <span>{thread.title}</span>
               </SidebarMenuButton>
-            </SidebarMenuItem>
-          );
-    })}
+            </Link>
+          </SidebarMenuItem>
+        );
+      })}
     </>
   );
 

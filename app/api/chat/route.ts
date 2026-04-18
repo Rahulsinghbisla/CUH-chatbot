@@ -25,7 +25,7 @@ export async function POST(request: Request) {
   if (!existingThread) {
     await db.insert(thread).values({
       id: threadId,
-      title: messageContent.trim().slice(0, 10),
+      title: messageContent.trim().slice(0, 20),
       userId: session.user.id
     });
   }
