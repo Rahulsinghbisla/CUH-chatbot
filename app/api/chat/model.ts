@@ -2,13 +2,6 @@ import { ChatAnthropic } from "@langchain/anthropic";
 import { ChatOpenAI } from "@langchain/openai"
 import { ChatGoogle } from "@langchain/google";
 
-
-
-// export const llm = new ChatOpenAI({
-//   model: "gpt-5-mini",
-//   apiKey: process.env.OPENAI_API_KEY
-// })
-
 type modelId = "gpt-5-mini" | "gemini-2.5-flash-lite" | "claude-opus-4-6"
 type provider = "openai" | "google" | "anthropic"
 type modelTier = "free" | "subscription"

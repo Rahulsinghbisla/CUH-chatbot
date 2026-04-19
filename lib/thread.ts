@@ -5,7 +5,6 @@ import { thread } from "@/db/schema/thread-schema"
 import { desc, eq } from "drizzle-orm"
 import { auth } from "./auth"
 import { headers } from "next/headers"
-import { toast } from "sonner"
 
 export async function fetchThreads() {
     const session = await auth.api.getSession({

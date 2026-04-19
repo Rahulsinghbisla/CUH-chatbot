@@ -3,13 +3,13 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
 export interface Product {
-  id: string | number;
-  title: string;
-  description: string;
-  price: number;
-  rating: number;
-  thumbnail: string;
-  product_link?: string;
+    video_id: string,
+    link:string,
+    title: string,
+    channelName: string,
+    views: number,
+    thumbnail: string,
+    length: string,
 }
 
 export interface ProductCarouselProps {
@@ -40,12 +40,12 @@ export function ProductCarousel({
   }
 
   // Helper to render stars like Google Shopping
-  const renderStars = (rating: number) => {
+  const renderStars = (rating: string) => {
     return (
       <div className="flex items-center gap-0.5">
         <Star className="size-3.5 fill-yellow-400 text-yellow-400" />
         <span className="text-xs font-medium ml-1">
-          {rating.toFixed(1)}
+          {rating}
         </span>
       </div>
     );
@@ -55,7 +55,7 @@ export function ProductCarousel({
     <div className="my-6 w-full overflow-hidden">
       <div className="flex items-center justify-between mb-4 px-1">
         <h3 className="text-sm font-medium text-foreground">
-          Top shopping results for{" "}
+          Here are the Videos of {" "}
           <span className="font-semibold text-primary">
             "{query}"
           </span>
@@ -71,10 +71,10 @@ export function ProductCarousel({
       <div className="flex  overflow-x-auto snap-x snap-mandatory hide-scrollbar -mx-1 px-1 gap-x-4">
         {products.map((product) => (
           <Card
-            key={product.id}
+            key={product.video_id}
             className="shrink-0 w-55 sm:w-60 snap-start flex flex-col overflow-hidden hover:shadow-lg transition-all duration-300 border-border/50 group cursor-pointer bg-card p-0">
             {/* Image Container - White background to act like a lightbox for product images */}
-            <a href={product.product_link} target="_blank">
+            <a href={product.link} target="_blank">
               <div className="relative h-45 w-full bg-white flex items-center justify-center p-6 border-b border-border/50 overflow-hidden">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
@@ -93,9 +93,9 @@ export function ProductCarousel({
                 {product.title}
               </h4>
 
-              {product.rating > 0 && (
+              {product.length  && (
                 <div className="mt-0.5">
-                  {renderStars(product.rating)}
+                  {renderStars(product.length)}
                 </div>
               )}
 
@@ -103,7 +103,7 @@ export function ProductCarousel({
                 <div className="flex items-baseline gap-1">
                   <span className="font-bold text-xl tracking-tight text-foreground">
                     $
-                    {product.price.toLocaleString(
+                    {product.views.toLocaleString(
                       undefined,
                       {
                         minimumFractionDigits: 2,
@@ -114,7 +114,7 @@ export function ProductCarousel({
                 </div>
                 {/* Store Name (Description mapped to source in the tool) */}
                 <div className="text-xs text-muted-foreground font-medium mt-1 truncate">
-                  {product.description}
+                  {product.channelName}
                 </div>
               </div>
             </CardContent>

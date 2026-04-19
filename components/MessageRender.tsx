@@ -14,6 +14,7 @@ import {
   MessageResponse,
 } from "./ai-elements/message";
 import { ProductCarousel } from "./gen-ui/product-carsoul";
+import YoutubeVideos from "./gen-ui/youtube-videos";
 
 
 const MessageRenderer = ({
@@ -43,7 +44,7 @@ const MessageRenderer = ({
                       isLastMessage && (
                         <MessageActions>
                           <MessageAction
-                            onClick={() => {}}
+                            onClick={() => { }}
                             label="Retry">
                             <RefreshCcwIcon className="size-3" />
                           </MessageAction>
@@ -61,8 +62,21 @@ const MessageRenderer = ({
                   </Fragment>
                 );
               case "dynamic-tool":
+                console.log("object", part.toolName)
                 switch (part.toolName) {
-                  case "display_products":
+                  case "getSearchYoutube":
+                    if (part.output) {
+                      const toolContent = JSON.parse(
+                        (part.output as any).kwargs.content,
+                      );
+                      console.log("tool content is ", toolContent)
+                      return (
+                        <div
+                          key={`${part.toolCallId}-${i}`}>
+                          <YoutubeVideos query={toolContent.query} list={toolContent.list} />
+                        </div>
+                      );
+                    }
                     if (part.state === "output-available") {
                       const toolContent = JSON.parse(
                         (part.output as any).kwargs.content,
